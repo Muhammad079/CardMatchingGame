@@ -1,23 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+namespace Scripts.Managers
 {
-    public AudioSource source1; // for background music
-    public AudioSource source2; // for other Instant music
-
-    public static AudioManager Instance;
-    private void Awake()
+    public class AudioManager : MonoBehaviour
     {
-        if (Instance == null)
-            Instance = this;
-    }
+        public AudioSource Source1; // for background music
+        public AudioSource Source2; // for other Instant music
 
-    public void PlayInstantMusic(AudioClip clip)
-    {
-        source2.clip = clip;
-        source2.Play();
+        public static AudioManager Instance;
+        private void Awake()
+        {
+            if (Instance == null)
+                Instance = this;
+        }
+
+        public void PlayInstantMusic(AudioClip clip)
+        {
+            Source2.clip = clip;
+            Source2.Play();
+        }
     }
-    
 }

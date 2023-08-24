@@ -1163,9 +1163,6 @@ MonoBehaviour:
   - {fileID: 1065866911}
   - {fileID: 758456221}
   _timeToCompareResult: 0.5
-  Restart: {fileID: 1179902511}
-  Save: {fileID: 165884144}
-  Load: {fileID: 314768538}
   _timeToShowCards: 3
 --- !u!4 &443894033
 Transform:
@@ -1194,7 +1191,7 @@ GameObject:
   - component: {fileID: 678748723}
   - component: {fileID: 678748722}
   m_Layer: 5
-  m_Name: Loading
+  m_Name: GameOver And Restart Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3224,8 +3221,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd478e26923226d42a9f764a91061e77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source1: {fileID: 1556172091}
-  source2: {fileID: 1556172090}
+  Source1: {fileID: 1556172091}
+  Source2: {fileID: 1556172090}
 --- !u!1 &1574551399
 GameObject:
   m_ObjectHideFlags: 0
@@ -4366,8 +4363,9 @@ GameObject:
   - component: {fileID: 2096280727}
   - component: {fileID: 2096280729}
   - component: {fileID: 2096280728}
+  - component: {fileID: 2096280730}
   m_Layer: 5
-  m_Name: Side Panel
+  m_Name: Game State UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4432,3 +4430,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2096280726}
   m_CullTransparentMesh: 1
+--- !u!114 &2096280730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096280726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4085e9ae0ec32724994736c5618a290a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Save: {fileID: 165884144}
+  Load: {fileID: 314768538}
+  Reset: {fileID: 1179902511}
+  Exit: {fileID: 212569519}
