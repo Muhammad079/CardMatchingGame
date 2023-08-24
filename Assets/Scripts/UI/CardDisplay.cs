@@ -21,6 +21,7 @@ public class CardDisplay : MonoBehaviour
     private Sprite _cardFaceUp;
 
     private bool _FaceUp = false;
+    private bool isRotating;
     private void Awake()
     {
         SetupCard();
@@ -48,17 +49,21 @@ public class CardDisplay : MonoBehaviour
     public void OnClick()
     {
         _FaceUp = !_FaceUp;
-        coroutine = StartCoroutine(RotateThisCard(_FaceUp, () =>
+        if (!isRotating)
         {
-            SetCardStatus(_FaceUp, () =>
+            coroutine = StartCoroutine(RotateThisCard(_FaceUp, () =>
             {
-                if (cardFace == CardFace.faceup)
+                AudioManager.Instance.PlayInstantMusic(CardDetails.FlipAudio);
+                SetCardStatus(_FaceUp, () =>
                 {
-                    GameManager.Instance.CardFlippedInvoke(this);
-                }
-                StopCoroutine(coroutine);
-            });
-        }));
+                    if (cardFace == CardFace.faceup)
+                    {
+                        GameManager.Instance.CardFlippedInvoke(this);
+                    }
+                    StopCoroutine(coroutine);
+                });
+            }));
+        }
     }
 
     public void SetCardStatus(bool _faceUp, Action StatusFinalized = null)
@@ -77,11 +82,15 @@ public class CardDisplay : MonoBehaviour
     }
     public void SetCardFaceUp(bool status, Action FacedUp = null)
     {
-        StartCoroutine(RotateThisCard(status, FacedUp));
+        if (!isRotating)
+        {
+            StartCoroutine(RotateThisCard(status, FacedUp));
+        }
     }
 
     private IEnumerator RotateThisCard(bool faceUp, Action RotationCompleted = null)
     {
+        isRotating = true;
         for (int i = 0; i <= 90; i += 10)
         {
             transform.rotation = Quaternion.Euler(0, i, 0);
@@ -96,6 +105,7 @@ public class CardDisplay : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, i, 0);
             yield return new WaitForSeconds(CardAnimationTime);
         }
+        isRotating = false;
         RotationCompleted?.Invoke();
     }
 }

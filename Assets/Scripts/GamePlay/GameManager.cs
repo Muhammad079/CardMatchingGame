@@ -84,17 +84,18 @@ public class GameManager : MonoBehaviour
         }
         if(clickCount % 2 == 0 && Cards.Count ==2)
         {
+            Stats.Instance.InvokeTurn(TurnCalculator.Instance.GetCurrentTurn().ToString());
             StartCoroutine(TestTheCards());
         }
     }
 
     private IEnumerator TestTheCards()
     {
-        Debug.LogError(Cards[0].CardID + " " + Cards[1].CardID);
         yield return new WaitForSeconds(_timeToCompareResult);
         if (Cards[0].CardID == Cards[1].CardID)
         {
             Cards.ForEach(x => x.gameObject.SetActive(false));
+            Stats.Instance.InvokeScore(ScoreCalculator.Instance.GetScore().ToString());
         }
         else
         {

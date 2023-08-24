@@ -9,4 +9,5 @@ public class Card : ScriptableObject
     public Sprite FaceUp;
     public Sprite FaceDown;
 
+    public AudioClip FlipAudio;
 }

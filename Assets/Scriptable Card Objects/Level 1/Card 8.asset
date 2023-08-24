@@ -15,3 +15,4 @@ MonoBehaviour:
   CardID: 8
   FaceUp: {fileID: 21300000, guid: 222f1451e0c1d454fa28e3c921bc3ec0, type: 3}
   FaceDown: {fileID: 21300000, guid: 2e9324b783d7aeb40a0e9f3967b71868, type: 3}
+  FlipAudio: {fileID: 8300000, guid: f065687747e0d8248aaea8e02fb1b0fc, type: 3}
