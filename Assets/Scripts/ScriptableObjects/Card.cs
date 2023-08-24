@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName ="Card", menuName ="New Card")]
 public class Card : ScriptableObject
 {
-    public string CardName;
+    public string CardID;
     public Sprite FaceUp;
     public Sprite FaceDown;
 

@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 296e00ec9833e6940b00e6af28c346cf, type: 3}
-  m_Name: Card 16
+  m_Name: Card 14
   m_EditorClassIdentifier: 
-  CardName: 8
-  FaceUp: {fileID: 21300000, guid: 222f1451e0c1d454fa28e3c921bc3ec0, type: 3}
+  CardID: 6
+  FaceUp: {fileID: 21300000, guid: fa3ef812231c5a84fadb2fb21dc8bbeb, type: 3}
   FaceDown: {fileID: 21300000, guid: 2e9324b783d7aeb40a0e9f3967b71868, type: 3}
