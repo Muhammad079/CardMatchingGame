@@ -167,6 +167,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 305c1cc6d3935344cb5b8cba33f30326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardData:
+    CardDetails: {fileID: 11400000, guid: 733f147d6486cd441b3b0c4239ef6bc4, type: 2}
+    CardID: 
+    cardFace: 1
+    SelectionStatus: 0
   CardDetails: {fileID: 11400000, guid: 733f147d6486cd441b3b0c4239ef6bc4, type: 2}
   CardAnimationTime: 0.02
   CardID: 

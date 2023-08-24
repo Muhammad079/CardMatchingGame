@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,9 +11,13 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private List<Card> _cardsData;
     private List<CardDisplay> Cards = new();
+    private List<GameObject> GamePlayCards = new();
 
     [SerializeField]
     private CardDisplay _card;
+    
+    [SerializeField]
+    private GameObject LoadingScreen;
     
     [SerializeField]
     private Transform[] _CardHolders;
@@ -21,15 +26,12 @@ public class GameManager : MonoBehaviour
     private float _timeToCompareResult;
     
     [SerializeField]
-    private Button Restart;
+    private Button Restart, Save, Load;
     
     [SerializeField]
     private int _timeToShowCards;
     private int clickCount;
-    
-    private string TempCardID;
 
-    public List<GameObject> GamePlayCards;
     public Action<CardDisplay> CardFlipped;
     public static GameManager Instance;
 
@@ -45,6 +47,8 @@ public class GameManager : MonoBehaviour
         CardFlipped += OnCardFlipped;
 
         Restart.onClick.AddListener(() => RestartTheGame());
+        Save.onClick.AddListener(() => SavePlayerState());
+        Load.onClick.AddListener(() => LoadPlayerState());
     }
 
     private void Shuffle<T>(List<T> list, Action Shuffled)
@@ -88,21 +92,17 @@ public class GameManager : MonoBehaviour
     private void OnCardFlipped(CardDisplay card)
     {
         clickCount++;
-        Debug.LogError(clickCount);
         if(!Cards.Contains(card) && card.SelectionStatus == CardDisplay.Selection.Selected)
         {
-            Debug.LogError("inside if");
             Cards.Add(card);
         }
         else
         {
             Cards.Clear();
             clickCount = 0;
-            Debug.Log("Clearing the list");
         }
         if(clickCount % 2 == 0 && Cards.Count == 2)
         {
-            Debug.LogError("inside if");
             Stats.Instance.InvokeTurn(TurnCalculator.Instance.GetCurrentTurn().ToString());
             StartCoroutine(TestTheCards());
         }
@@ -110,12 +110,12 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator TestTheCards()
     {
-        Debug.LogError("Testing the cards");
         yield return new WaitForSeconds(_timeToCompareResult);
         if (Cards[0].CardID == Cards[1].CardID && Cards.Count == 2)
         {
             Cards.ForEach(x => x.gameObject.SetActive(false));
             Stats.Instance.InvokeScore(ScoreCalculator.Instance.GetScore ().ToString());
+            CheckIfGameCompleted();
         }
         else
         {
@@ -123,7 +123,6 @@ public class GameManager : MonoBehaviour
             go.GetComponent<CardDisplay>().SelectionStatus == CardDisplay.Selection.Selected).ToList().ForEach(x =>
             {
                 x.GetComponent<CardDisplay>().SetCardFaceUp(false, () => { x.GetComponent<CardDisplay>().SetCardStatus(false); });
-
             });
         }
         Cards.Clear();
@@ -132,7 +131,9 @@ public class GameManager : MonoBehaviour
 
     public void RestartTheGame()
     {
+        Restart.interactable = false;
         StartCoroutine(RestartingGame());
+        DisplayLoadingPopUp(true);
     }
 
     private IEnumerator RestartingGame()
@@ -146,19 +147,83 @@ public class GameManager : MonoBehaviour
         Shuffle(GamePlayCards,
             () =>
             {
-                Debug.Log("Shuffled");
+                for (int i = 0; i < GamePlayCards.Count; i++)
+                {
+                    GamePlayCards[i].transform.SetParent(_CardHolders[i]);
+                }
+                GamePlayCards.Select(y=>y.GetComponent<CardDisplay>()).ToList().ForEach(x =>
+                {
+                    x.gameObject.SetActive(true);
+                    x.SetupCard();
+                    x.SetCardStatus(false);
+                    StartCoroutine(x.ShowCardsForTime(_timeToShowCards));
+                    x.SetCardFaceUp(false);
+                });
             });
 
-        for (int i = 0; i < GamePlayCards.Count; i++)
-        {
-            GamePlayCards[i].transform.SetParent(_CardHolders[i]);
-        }
-        GamePlayCards.ForEach(x =>
-        {
-            x.SetActive(true);
-            x.GetComponent<CardDisplay>().SetupCard();
-            StartCoroutine(x.GetComponent<CardDisplay>().ShowCardsForTime(_timeToShowCards));
-            x.GetComponent<CardDisplay>().SetCardFaceUp(false);
-        });
+        Restart.interactable = true;
+        DisplayLoadingPopUp(false);
     }
+
+    void CheckIfGameCompleted()
+    {
+        if(GamePlayCards.Where(x=>x.activeInHierarchy).ToList().Count ==0)
+        {
+            DisplayLoadingPopUp(true);
+        }
+    }
+
+    private void DisplayLoadingPopUp(bool status)
+    {
+        LoadingScreen.gameObject.SetActive(status);
+    }
+    public PlayerState playerState;
+    public void SavePlayerState()
+    {
+        playerState = new PlayerState();
+        playerState.PlayerCardsState = GamePlayCards.Where(a=>a.activeInHierarchy).Select(x => x.GetComponent<CardDisplay>().cardData).ToList();
+
+        var json = JsonConvert.SerializeObject(playerState);
+        Debug.LogError(json);
+        PlayerPrefs.SetString("Progress", json);
+    }
+
+    public void LoadPlayerState()
+    {
+        if (string.IsNullOrEmpty(PlayerPrefs.GetString("Progress")))
+            return;
+        var json = PlayerPrefs.GetString("Progress");
+        playerState = JsonConvert.DeserializeObject<PlayerState>(json);
+        GamePlayCards.ForEach(x => x.SetActive(false));
+        foreach (var item in GamePlayCards)
+        {
+            for (int i = 0; i < playerState.PlayerCardsState.Count; i++)
+            {
+                if (item.GetComponent<CardDisplay>().cardData.CardID == playerState.PlayerCardsState[i].CardID)
+                    item.SetActive(true);
+            }
+        }
+
+        Stats.Instance.InvokeScore(ScoreCalculator.Instance.ResetScore().ToString());
+        Stats.Instance.InvokeTurn(TurnCalculator.Instance.ResetTurns().ToString());
+        Cards.Clear();
+        var oldCards = GamePlayCards.Where(x => x.activeInHierarchy).ToList();
+        Debug.LogError("Old count" + oldCards.Count);
+        oldCards.Select(y => y.GetComponent<CardDisplay>()).ToList().
+            ForEach(z =>
+            {
+                z.gameObject.SetActive(false);
+                z.gameObject.SetActive(true);
+                z.SetupCard();
+                z.SetCardStatus(false);
+                //StartCoroutine(z.ShowCardsForTime(_timeToShowCards));
+                z.SetCardFaceUp(false);
+            });
+    }
+}
+[Serializable]
+public class PlayerState
+{
+    [SerializeField]
+    public List<CardData> PlayerCardsState = new();
 }

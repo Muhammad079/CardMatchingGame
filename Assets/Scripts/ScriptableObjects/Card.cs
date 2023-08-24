@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName ="Card", menuName ="New Card")]
+[Serializable]
 public class Card : ScriptableObject
 {
     public string CardID;

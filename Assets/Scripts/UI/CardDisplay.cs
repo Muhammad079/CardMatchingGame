@@ -5,6 +5,8 @@ using System.Collections;
 
 public class CardDisplay : MonoBehaviour
 {
+    [SerializeField]
+    public CardData cardData;
     public Card CardDetails;
 
     public float CardAnimationTime;
@@ -43,6 +45,11 @@ public class CardDisplay : MonoBehaviour
             _cardFaceDown = CardDetails.FaceDown;
             _cardFaceUp = CardDetails.FaceUp;
             CardID = CardDetails.CardID;
+
+            //cardData.CardDetails = CardDetails;
+            //cardData._cardFaceDown = CardDetails.FaceDown;
+            //cardData._cardFaceUp = CardDetails.FaceUp;
+            cardData.CardID = CardDetails.CardID;
         }
     }
     Coroutine coroutine;
@@ -113,4 +120,24 @@ public class CardDisplay : MonoBehaviour
         isRotating = false;
         RotationCompleted?.Invoke();
     }
+}
+[Serializable]
+public class CardData
+{
+    //[SerializeField]
+    //public Card CardDetails;
+
+    public string CardID;
+    [SerializeField]
+    public enum CardFace { faceup, facedown }
+    public CardFace cardFace;
+    [SerializeField]
+    public enum Selection { Selected, NotSelected }
+    public Selection SelectionStatus;
+    //[SerializeField]
+    //public Sprite _cardFaceDown;
+    //[SerializeField]
+    //public Sprite _cardFaceUp;
+    [SerializeField]
+    private bool _FaceUp = false;
 }
