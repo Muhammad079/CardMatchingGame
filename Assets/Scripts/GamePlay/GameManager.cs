@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class GameManager : MonoBehaviour
    
     [SerializeField]
     private float _timeToCompareResult;
+    
+    [SerializeField]
+    private Button Restart;
     
     [SerializeField]
     private int _timeToShowCards;
@@ -39,6 +43,8 @@ public class GameManager : MonoBehaviour
             InstantiateCardsRandomly();
         });
         CardFlipped += OnCardFlipped;
+
+        Restart.onClick.AddListener(() => RestartTheGame());
     }
 
     private void Shuffle<T>(List<T> list, Action Shuffled)
@@ -73,17 +79,30 @@ public class GameManager : MonoBehaviour
         CardFlipped?.Invoke(card);
     }
 
-
+    internal void ClearCards()
+    {
+        Cards.Clear();
+        clickCount = 0;
+    }
 
     private void OnCardFlipped(CardDisplay card)
     {
         clickCount++;
+        Debug.LogError(clickCount);
         if(!Cards.Contains(card) && card.SelectionStatus == CardDisplay.Selection.Selected)
         {
+            Debug.LogError("inside if");
             Cards.Add(card);
         }
-        if(clickCount % 2 == 0 && Cards.Count ==2)
+        else
         {
+            Cards.Clear();
+            clickCount = 0;
+            Debug.Log("Clearing the list");
+        }
+        if(clickCount % 2 == 0 && Cards.Count == 2)
+        {
+            Debug.LogError("inside if");
             Stats.Instance.InvokeTurn(TurnCalculator.Instance.GetCurrentTurn().ToString());
             StartCoroutine(TestTheCards());
         }
@@ -91,11 +110,12 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator TestTheCards()
     {
+        Debug.LogError("Testing the cards");
         yield return new WaitForSeconds(_timeToCompareResult);
-        if (Cards[0].CardID == Cards[1].CardID)
+        if (Cards[0].CardID == Cards[1].CardID && Cards.Count == 2)
         {
             Cards.ForEach(x => x.gameObject.SetActive(false));
-            Stats.Instance.InvokeScore(ScoreCalculator.Instance.GetScore().ToString());
+            Stats.Instance.InvokeScore(ScoreCalculator.Instance.GetScore ().ToString());
         }
         else
         {
@@ -112,6 +132,33 @@ public class GameManager : MonoBehaviour
 
     public void RestartTheGame()
     {
-        //Shuffle()
+        StartCoroutine(RestartingGame());
+    }
+
+    private IEnumerator RestartingGame()
+    {
+        Stats.Instance.InvokeScore(ScoreCalculator.Instance.ResetScore().ToString());
+        Stats.Instance.InvokeTurn(TurnCalculator.Instance.ResetTurns().ToString());
+        GamePlayCards.ToList().ForEach(x => x.gameObject.SetActive(false));
+        Cards.Clear();
+        _CardHolders.ToList().ForEach(x => x.DetachChildren());
+        yield return new WaitForSeconds(5);
+        Shuffle(GamePlayCards,
+            () =>
+            {
+                Debug.Log("Shuffled");
+            });
+
+        for (int i = 0; i < GamePlayCards.Count; i++)
+        {
+            GamePlayCards[i].transform.SetParent(_CardHolders[i]);
+        }
+        GamePlayCards.ForEach(x =>
+        {
+            x.SetActive(true);
+            x.GetComponent<CardDisplay>().SetupCard();
+            StartCoroutine(x.GetComponent<CardDisplay>().ShowCardsForTime(_timeToShowCards));
+            x.GetComponent<CardDisplay>().SetCardFaceUp(false);
+        });
     }
 }

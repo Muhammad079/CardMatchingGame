@@ -20,4 +20,9 @@ public class ScoreCalculator : MonoBehaviour
         CurrentScore += ScoreIncrement;
         return CurrentScore;
     }
+
+    public int ResetScore()
+    {
+        return CurrentScore = 0;
+    }
 }

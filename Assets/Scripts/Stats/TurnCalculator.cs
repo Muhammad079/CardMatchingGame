@@ -20,4 +20,8 @@ public class TurnCalculator : MonoBehaviour
         CurrentTurnNumber += Increment;
         return CurrentTurnNumber;
     }
+    public int ResetTurns()
+    {
+        return CurrentTurnNumber = 0;
+    }
 }

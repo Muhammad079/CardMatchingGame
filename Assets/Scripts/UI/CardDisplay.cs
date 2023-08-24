@@ -22,7 +22,7 @@ public class CardDisplay : MonoBehaviour
 
     private bool _FaceUp = false;
     private bool isRotating;
-    private void Awake()
+    private void OnEnable()
     {
         SetupCard();
         RectTransform rect = GetComponent<RectTransform>();
@@ -30,6 +30,8 @@ public class CardDisplay : MonoBehaviour
         rect.anchorMax = new Vector2(1, 1);
         rect.anchorMin = new Vector2(0, 0);
         rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.offsetMax = Vector2.zero;
+        rect.offsetMin = Vector2.zero;
     }
 
     public void SetupCard()
@@ -42,7 +44,6 @@ public class CardDisplay : MonoBehaviour
             _cardFaceUp = CardDetails.FaceUp;
             CardID = CardDetails.CardID;
         }
-
     }
     Coroutine coroutine;
 
@@ -59,6 +60,10 @@ public class CardDisplay : MonoBehaviour
                     if (cardFace == CardFace.faceup)
                     {
                         GameManager.Instance.CardFlippedInvoke(this);
+                    }
+                    else
+                    {
+                        GameManager.Instance.ClearCards();
                     }
                     StopCoroutine(coroutine);
                 });

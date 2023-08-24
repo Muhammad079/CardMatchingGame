@@ -39,4 +39,10 @@ public class Stats : MonoBehaviour
     {
         Score.text = obj;
     }
+
+    public void ResetStats()
+    {
+        Score.text = "0";
+        Turns.text = "0";
+    }
 }
